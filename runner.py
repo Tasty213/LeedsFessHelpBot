@@ -2,18 +2,59 @@
 import requests
 import json
 
-def longTermTokenRetrieve(  ):
+def export(settings):
+    lines = ["# Constant ID's needed throughout the app\n",
+            "appID="+settings['appID']+'\n',
+            "appSecret="+settings['appSecret']+'\n',
+            "shortTermToken="+settings['shortTermToken']+'\n',
+            "longTermToken="+settings['longTermToken']+'\n',
+            "# Keywords to search for in posts"+'\n']
+    for key in settings['keywords']:
+        lines.append("key="+key+'\n')
+    lines.append("# Support message to post"+'\n')
+    lines.append("support="+settings['support']+'\n')
 
-    # Constant ID's needed throughout the app
-    appId = '457899854959751'
-    appSecret = '7ecee5ac6651623bfc286a12e19e9f3d'
-    shortTermToken = 'EAAGgdR4ylIcBAFwP6dFYs7kkZAzRRNEZAtYlUOugqGN93fhoo0REOvdUqlZAIARwBBHRNQTWWqP0lbSrJl9VVkb42n34EBPMUJ19ALfIIIf73WdYNPfSsmle7KkLmSaNfJkpIjZBnUaThwsscZA85mUdmGIUyN7yzuX9QGmafDsziJquPuWI6ZBKlvlyNCbEo6agN7qlFDXzQA8wmXrULN'
+    with open('config.txt', 'w') as config:
+        config.writelines(lines)
+
+def loadConfig():
+    with open('config.txt') as keywordsSet:
+        keywords = keywordsSet.read().splitlines()
+
+    settingsTemp = []
+
+    for i in keywords:
+        if not i[0] == '#':
+            settingsTemp.append(i)
+
+    settings = {'export': export,
+                'keywords': []}
+
+    for current in settingsTemp:
+        if not current.find('appID') == -1:
+            settings['appID'] = current[6:]
+        elif not current.find('appSecret') == -1:
+            settings['appSecret'] = current[10:]
+        elif not current.find('shortTermToken') == -1:
+            settings['shortTermToken'] = current[15:]
+        elif not current.find('longTermToken') == -1:
+            settings['longTermToken'] = current[14:]
+        elif not current.find('key') == -1:
+            settings['keywords'].append(current[4:])
+        elif not current.find('support') == -1:
+            settings['support'] = current[8:]
+        else:
+            print('error could not assign this entry to a variable, entry is: ', current)
+
+    return settings
+
+def longTermTokenRetrieve(settings):
 
     # Prepare the url to get the access token with
-    urlAccessToken = 'https://graph.facebook.com/v2.10/oauth/access_token?grant_type=fb_exchange_token&client_id=' + appId + '&client_secret=' + appSecret + '&fb_exchange_token=' + shortTermToken
+    urlAccessToken = 'https://graph.facebook.com/v5.0/oauth/access_token?grant_type=fb_exchange_token&client_id=' + settings['appID'] + '&client_secret=' + settings['appSecret'] + '&fb_exchange_token=' + settings['shortTermToken']
 
     # Print the URL to be sent to for debugging
-    print('URL for Access token request: ', urlAccessToken)
+    #print('URL for Access token request: ', urlAccessToken)
 
     # Send get request and save returned JSON as a dict
     accessTokenGET = requests.get(urlAccessToken)
@@ -21,15 +62,15 @@ def longTermTokenRetrieve(  ):
 
     # Extract the access token from the dict
     access_token = str(data['access_token'])
-    print('Access token received: ', access_token)
+    #print('Access token received: ', access_token)
+    settings['longTermToken'] = access_token
+    print(access_token)
+    settings['export'](settings)
 
-def postRetrieve(  ):
-    appId = '457899854959751'
-    appSecret = '7ecee5ac6651623bfc286a12e19e9f3d'
-    longTermToken = 'EAAGgdR4ylIcBABs2UtgNWC3etOFng2Y3AbZCGJgJx6jFV9rFb451osBY6Mr0m01F8rZC6IZCsVlPJLzxlddZC3oFwyHSfffRpcvkaZCoZB0nPuqK6PwalKh8pjPDddNTtQa7bJ1WmURAGJq4M2UK56R297IZAKZCoPFUMWzkEY4CZCjnHj9hZCNhe8'
+def postRetrieve(settings):
 
     # Prepare the GET request for posts
-    urlPosts = 'https://graph.facebook.com/v3.3/1625499394249300/posts?access_token=' + longTermToken
+    urlPosts = 'https://graph.facebook.com/v5.0/108772043998503/posts?access_token=' + settings['longTermToken']
 
     # Takes the returned data and turns it into a dict which has a list in it
     posts = requests.get(urlPosts)
@@ -41,10 +82,6 @@ def postRetrieve(  ):
     # Create the output list ready to be populated
     messageID = []
 
-    # Open keywords.txt and turn into a list
-    with open('keywords.txt') as keywordsSet:
-        keywords = keywordsSet.read().splitlines()
-
     # Iterate through the list and Extract the message IDs ready to be returned
     for i in range(postNumber):
         # Get each individual message and metadata
@@ -52,7 +89,7 @@ def postRetrieve(  ):
         # Separate the message from the metadata
         message = messagePack['message']
         # If any of the keywords in the list loaded from keywords.txt is in the message currently being checked add its messageID to the messageID list
-        if any(checker in message for checker in keywords):
+        if any(checker in message for checker in settings['keywords']):
             # Add the current ID to the list
             messageID.append(messagePack['id'])
 
@@ -63,20 +100,11 @@ def postRetrieve(  ):
     return(messageID)
 
 
-# Declare module variables
-appId = '457899854959751'
-appSecret = '7ecee5ac6651623bfc286a12e19e9f3d'
-longTermToken = 'EAAGgdR4ylIcBABs2UtgNWC3etOFng2Y3AbZCGJgJx6jFV9rFb451osBY6Mr0m01F8rZC6IZCsVlPJLzxlddZC3oFwyHSfffRpcvkaZCoZB0nPuqK6PwalKh8pjPDddNTtQa7bJ1WmURAGJq4M2UK56R297IZAKZCoPFUMWzkEY4CZCjnHj9hZCNhe8'
-
-# Open the support message that will be commented
-with open('support.txt', 'r') as file:
-    support = file.read().replace('\n', '')
-
 # This function checks if the support message has already been posted (will return False if it has)
-def checkComments( ID ):
+def checkComments(ID, settings):
 
     # Prepare the GET request for posts
-    urlPosts = 'https://graph.facebook.com/v3.3/' + ID + '/comments?access_token=' + longTermToken
+    urlPosts = 'https://graph.facebook.com/v5.0/' + ID + '/comments?access_token=' + settings['longTermToken']
 
     # Takes the returned data and turns it into a dict which has a list in it
     posts = requests.get(urlPosts)
@@ -95,12 +123,17 @@ def checkComments( ID ):
             comments.append(data['message'])
 
         # If the support message is in any of the comments
-        if any(checker in support for checker in comments):
+        if any(checker in settings['support'] for checker in comments):
             return(False)
         else:
             return(True)
     else:
         return(True)
 
-def post( ID ):
-    pass
+def post(ID, settings):
+    urlComment = 'https://graph.facebook.com/v5.0/' + ID + '/comments?message=' + settings['support'] + '&access_token=' + settings['longTermToken']
+    print(urlComment)
+    posts = requests.post(urlComment)
+    print(posts)
+    postsComment = posts.json()
+    print(postsComment)

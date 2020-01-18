@@ -1,4 +1,12 @@
 # Constant ID's needed throughout the app
-appId = '457899854959751'
-appSecret = '7ecee5ac6651623bfc286a12e19e9f3d'
-longTermToken = 'EAAGgdR4ylIcBABs2UtgNWC3etOFng2Y3AbZCGJgJx6jFV9rFb451osBY6Mr0m01F8rZC6IZCsVlPJLzxlddZC3oFwyHSfffRpcvkaZCoZB0nPuqK6PwalKh8pjPDddNTtQa7bJ1WmURAGJq4M2UK56R297IZAKZCoPFUMWzkEY4CZCjnHj9hZCNhe8'
+appID=457899854959751
+appSecret=7ecee5ac6651623bfc286a12e19e9f3d
+shortTermToken=EAAGgdR4ylIcBAFzz2hQlFEmVrZBYmVHpilh3rZCtgdR927zc0YLJItZC3D7ZAAHYQ6yZCUodEZA47oiVGtqo6WZB7vOsqvuLWp99XG7USfnOAx4wTnvc6xbm3OChQTOX19t3821NdEtiJ46rNhskBvk5ZANDS9jy05tB7bjk9mxXjBsVFBiTSkktsz62igICtwQik61LzFZCcdAZDZD
+longTermToken=EAAGgdR4ylIcBAEXKZCO8Shrc0NZAATtOBeRitqu4T7vwbhjXVZBqFGEEG3i8h0ptf9oZAnTQ9QDQDucfr7RJJnI4vnvYTq6ZAntx5fDgfffWcFE7Y7Kqe9MZAirZAQEnL1QtOAjq7qtKW0hu9ZBw3aYkSYvYZAJ5wsHl7SZAk4B1MakgZDZD
+# Keywords to search for in posts
+key=keyword
+key=keyword2
+key=keyword3
+key=key phrase is also acceptable
+# Support message to post
+support=The support message to comment onto applicable posts should be posted here once changed it may be necessary to restart the program -- George
