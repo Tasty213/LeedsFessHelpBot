@@ -2,34 +2,49 @@
 import requests
 import json
 
-def export(settings):
-    lines = ["# Constant ID's needed throughout the app\n",
-            "appID="+settings['appID']+'\n',
-            "appSecret="+settings['appSecret']+'\n',
-            "shortTermToken="+settings['shortTermToken']+'\n',
-            "longTermToken="+settings['longTermToken']+'\n',
-            "# Keywords to search for in posts"+'\n']
-    for key in settings['keywords']:
-        lines.append("key="+key+'\n')
-    lines.append("# Support message to post"+'\n')
-    lines.append("support="+settings['support']+'\n')
-
-    with open('config.txt', 'w') as config:
-        config.writelines(lines)
-
 def loadConfig():
-    with open('config.txt') as keywordsSet:
-        keywords = keywordsSet.read().splitlines()
+    """
+    loadConfig() imports the settings used by the program from config.txt and
+    saves them for later use as a dictionary
+    """
 
-    settingsTemp = []
+    # First load the data from config.txt into a format useable by python
+    # The config file object is created with the name keywordsSet
+    with open('config.txt') as config:
+        # Read in the data from the object, save the result in a list with each
+        # line a new entry
+        settingsTemp = config.read().splitlines()
 
-    for i in keywords:
-        if not i[0] == '#':
-            settingsTemp.append(i)
+    # Remove any lines that from the list that are comments
+    # NOTE: a comment is any line that starts with a '#', a '#' partway through
+    #       a line will not comment out the rest of the line
 
+    # Create and empty list to hold the indexes of the lines to delete
+    toDelete = []
+
+    # Iterate through the list of lines imported
+    for i in range(0, len(settingsTemp)):
+        # If the current line is a comment the add its index to toDelete
+        if settingsTemp[i][0] == '#':
+            toPop.append(i)
+
+    # Iterate through the list of elements to delete and delete them
+    for i in sorted(toDelete, reverse = True):
+        del settingsTemp[i]
+
+
+    # The settings are stored in a dictionary, the following two entries need
+    # to be created now. 'export' is a reference to the export() function which
+    # when called exports the current settings. It is called by:
+    # settings['export'](settings)
+    # NOTE: the export function needs to be passed the settings dictionary
+    # The 'keywords' key needs to be added now to that values can be appended
+    # to it as it is unknown how many there will be
     settings = {'export': export,
                 'keywords': []}
 
+    # Take the current line and find what it is describing then assign it to the
+    # relevant key
     for current in settingsTemp:
         if not current.find('appID') == -1:
             settings['appID'] = current[6:]
@@ -46,7 +61,42 @@ def loadConfig():
         else:
             print('error could not assign this entry to a variable, entry is: ', current)
 
+    # return the settings dictionary
     return settings
+
+def export(settings):
+    """
+    This functions takes a the settings dictionary and saves it to the
+    config.txt file in the correct format to be later imported back into the
+    program
+    """
+
+    # Make a list of strings for each line of the config.txt file
+    # NOTE: theres a \n at the end of each string to ensure each list entry is
+    #       saed as a seperate line
+    lines = ["# Constant ID's needed throughout the app\n",
+            "appID="+settings['appID']+'\n',
+            "appSecret="+settings['appSecret']+'\n',
+            "shortTermToken="+settings['shortTermToken']+'\n',
+            "longTermToken="+settings['longTermToken']+'\n',
+            "# Keywords to search for in posts"+'\n']
+
+    # The keywords section needs to be created seperate from the rest to ensure
+    # that as many keywords can be specified as needed
+    # Iterate across each key in the keywords list
+    for key in settings['keywords']:
+        # Append a line that contains the key= identifier and the keyword
+        lines.append("key="+key+'\n')
+
+    # The support message can now be added
+    lines.append("# Support message to post"+'\n')
+    lines.append("support="+settings['support']+'\n')
+
+    # Open the config.txt file in overwrite mode
+    with open('config.txt', 'w') as config:
+        # Write all the lines to the file
+        config.writelines(lines)
+
 
 def longTermTokenRetrieve(settings):
 
