@@ -1,0 +1,4 @@
+The support message to comment onto applicable posts should be posted here
+once changed it may be necessary to restart the program
+
+George Sykes -- Main developer
