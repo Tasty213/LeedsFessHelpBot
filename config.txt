@@ -1,4 +1,11 @@
 # Constant ID's needed throughout the app
-appId = '457899854959751'
-appSecret = '7ecee5ac6651623bfc286a12e19e9f3d'
-longTermToken = 'EAAGgdR4ylIcBABs2UtgNWC3etOFng2Y3AbZCGJgJx6jFV9rFb451osBY6Mr0m01F8rZC6IZCsVlPJLzxlddZC3oFwyHSfffRpcvkaZCoZB0nPuqK6PwalKh8pjPDddNTtQa7bJ1WmURAGJq4M2UK56R297IZAKZCoPFUMWzkEY4CZCjnHj9hZCNhe8'
+appID=Insert App ID
+appSecret=Insert App Secret
+shortTermToken=Insert Short Term Token
+# Keywords to search for in posts
+key=keyword
+key=keyword2
+key=keyword3
+key=key phrase is also acceptable
+# Support message to post
+support=The support message to comment onto applicable posts
